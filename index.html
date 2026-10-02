@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BATTALION DH</title>
+<style>
+:root{
+  --ink:#18251b;--muted:#647164;--paper:#f7f5ea;--leaf:#315b3b;
+  --leaf2:#4f7a4f;--gold:#c69a45;--card:rgba(255,255,248,.90);
+  --line:rgba(31,65,39,.14);--shadow:0 18px 55px rgba(30,55,33,.14)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font-family:Georgia,serif;background:#dfe8d8}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.page{min-height:100vh;position:relative;overflow:hidden}
+.page:before{
+  content:"";position:fixed;inset:0;z-index:-2;
+  background:
+  linear-gradient(rgba(226,237,217,.72),rgba(226,237,217,.72)),
+  radial-gradient(circle at 15% 20%,#78976f 0 7%,transparent 8%),
+  radial-gradient(circle at 85% 30%,#62865d 0 9%,transparent 10%),
+  linear-gradient(135deg,#d9e6d0,#f5f1dc 45%,#cbdcc4);
+}
+.page:after{content:"";position:fixed;inset:0;z-index:-1;opacity:.22;background-image:radial-gradient(#355c3b 1px,transparent 1px);background-size:24px 24px}
+.container{max-width:1120px;margin:auto;padding:0 20px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.logo{font-weight:900;letter-spacing:3px;font-size:20px}
+.navlinks{display:flex;gap:18px}.navlinks a{color:var(--ink);text-decoration:none;font-size:14px}
+.hero{min-height:78vh;display:grid;place-items:center;text-align:center;padding:50px 0}
+.badge{display:inline-block;border:1px solid rgba(49,91,59,.3);border-radius:99px;padding:8px 15px;background:rgba(255,255,255,.5);font-size:12px;letter-spacing:2px}
+h1{font-size:clamp(55px,11vw,112px);line-height:.9;margin:22px 0 12px;letter-spacing:5px;text-shadow:0 4px 25px rgba(30,55,33,.12)}
+.hero p{max-width:650px;margin:0 auto 28px;font-size:19px;line-height:1.6;color:#465547}
+.quote{font-style:italic;font-size:17px;color:#3d5542;min-height:30px}
+.cta{display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{border:0;border-radius:12px;padding:13px 20px;background:var(--leaf);color:white;box-shadow:0 7px 18px rgba(49,91,59,.22)}
+.btn.alt{background:rgba(255,255,255,.7);color:var(--leaf);border:1px solid var(--line);box-shadow:none}
+.section{padding:65px 0}.section h2{font-size:38px;margin:0 0 10px}.section>p{color:var(--muted);max-width:680px;line-height:1.6}
+.options{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
+.option,.blogcard,.routine-shell{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+.option{padding:24px;min-height:205px;display:flex;flex-direction:column}.icon{font-size:30px}.option h3{margin:14px 0 8px}.option p{color:var(--muted);line-height:1.45;font-size:14px}.option .btn{margin-top:auto;align-self:flex-start}
+.blog{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}.blogcard{padding:24px}.blogcard h3{margin:8px 0}.blogcard p{color:var(--muted);line-height:1.55;font-size:14px}
+footer{text-align:center;padding:35px;color:#5d6a5d;font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(17,31,20,.52);display:none;place-items:center;padding:12px;z-index:20;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal.show{display:flex;align-items:flex-start;justify-content:center}.modalbox{width:min(850px,100%);max-height:calc(100vh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--paper);border-radius:24px;padding:22px;box-shadow:0 30px 90px rgba(0,0,0,.25);margin:auto 0}
+.modalbox h2{margin-top:0}.field{display:grid;gap:7px;margin:15px 0}.field input,.field select{padding:12px;border:1px solid var(--line);border-radius:10px;background:white}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+#routinePage{display:none;min-height:100vh;padding-bottom:60px}.routine-top{padding:30px 0 15px;display:flex;justify-content:space-between;gap:15px;align-items:center}
+.routine-shell{padding:25px}.welcome{display:flex;justify-content:space-between;gap:20px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:20px}.welcome h2{font-size:34px;margin:0}.small{color:var(--muted);font-size:14px}
+.progress{height:9px;background:#dfe6da;border-radius:99px;overflow:hidden;margin:15px 0}.fill{height:100%;width:0;background:var(--leaf2);transition:.25s}
+.day{border:1px solid var(--line);border-radius:16px;margin:14px 0;overflow:hidden;background:rgba(255,255,255,.65)}.dayhead{padding:15px 17px;background:rgba(68,112,70,.09);display:flex;justify-content:space-between;gap:10px}.tasks{padding:8px 14px}.task{display:flex;gap:12px;padding:12px 5px;border-bottom:1px solid var(--line);align-items:flex-start}.task:last-child{border-bottom:0}.task input{width:19px;height:19px;accent-color:var(--leaf);margin-top:2px}.task.done span{text-decoration:line-through;color:#849084}.reset{margin-left:auto}
+.chapterList{margin-top:8px;max-height:330px;overflow:auto;padding:8px;background:rgba(255,255,255,.55);border:1px solid var(--line);border-radius:12px}.chapterItem{display:flex;gap:7px;align-items:flex-start;padding:6px 3px;font-size:13px;line-height:1.25}.chapterItem input{margin-top:2px;accent-color:var(--leaf)}.lectureBox{width:70px;padding:6px;border:1px solid var(--line);border-radius:7px;background:white;margin-left:auto}.opRow{display:grid;grid-template-columns:1fr 80px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.opDay{background:rgba(68,112,70,.08);border-radius:12px;padding:12px;margin-top:10px}@media(max-width:700px){#operationModal .threecols{grid-template-columns:1fr!important}.chapterList{max-height:240px}}@media(max-width:850px){.options{grid-template-columns:repeat(2,1fr)}.blog{grid-template-columns:1fr}.navlinks{display:none}}
+@media(max-width:550px){.options{grid-template-columns:1fr}.hero{min-height:75vh}.welcome{display:block}.routine-top{display:block}.routine-top .btn{margin-top:10px}}
+
+/* Generated Operation — Mission DH style */
+.operation-plan{margin-top:20px}
+.operation-summary{background:rgba(68,112,70,.08);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:16px}
+.operation-summary h3{margin:0 0 6px;font-size:25px}
+.operation-summary .stats{color:var(--muted);font-size:15px}
+.operation-day{border:1px solid var(--line);border-radius:16px;margin:14px 0;overflow:hidden;background:rgba(255,255,255,.78);box-shadow:0 5px 18px rgba(30,55,33,.05)}
+.operation-day-head{padding:15px 17px;background:rgba(68,112,70,.09);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.operation-day-head b{font-size:21px}
+.operation-day-head span{color:var(--muted);font-size:14px}
+.operation-task{display:flex;align-items:flex-start;gap:12px;padding:15px 17px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4}
+.operation-task:last-child{border-bottom:0}
+.operation-task input{width:19px;height:19px;accent-color:var(--leaf);margin-top:2px;flex:none}
+.operation-task.done span{text-decoration:line-through;color:#849084}
+.operation-progress{height:8px;background:#dfe6da;border-radius:99px;overflow:hidden;margin-top:10px}
+.operation-progress-fill{height:100%;width:0;background:var(--leaf2);transition:.25s}
+.operation-empty{padding:18px;color:var(--muted);background:rgba(255,255,255,.7);border-radius:14px}
+
+.igBanner{display:flex;justify-content:space-between;align-items:center;margin:10px 0 18px;padding:18px 20px;border-radius:18px;background:linear-gradient(120deg,#17271b,#426b45);color:#fff;box-shadow:var(--shadow)}
+.igBanner strong{font-size:24px;letter-spacing:.5px}.igBanner span{padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.13);font-size:12px}
+.communityTabs{display:flex;gap:8px;margin:18px 0}.communityTab{border:1px solid var(--line);background:rgba(255,255,255,.72);padding:12px 16px;border-radius:12px;color:var(--ink);cursor:pointer}.communityTab.active{background:var(--leaf);color:white}
+.composer{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:18px}.composer textarea{width:100%;min-height:110px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff;font:inherit;color:var(--ink)}
+.composerActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.uploadBtn,.voiceBtn{display:inline-flex;align-items:center;padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;color:var(--ink)}
+.communityPost{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 8px 25px rgba(30,55,33,.07)}.postMeta{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}.postMeta b{font-size:15px}.postBody{line-height:1.55}.postPhoto{max-width:100%;border-radius:12px;margin-top:12px;display:block}.postActions{display:flex;gap:8px;margin-top:12px}.postAction{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 11px;color:var(--muted)}
+.moderatorNotice{background:rgba(198,154,69,.12);border:1px solid rgba(198,154,69,.3);border-radius:16px;padding:17px;margin-bottom:15px}
+
+.oneShotIntro{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:25px;box-shadow:var(--shadow);margin:12px 0 18px}
+.oneShotIntro h2{font-size:38px;margin:7px 0}.oneShotIntro p{color:var(--muted);line-height:1.55}
+.subjectCards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.subjectCard{min-height:190px;text-align:left;border:1px solid var(--line);border-radius:22px;background:var(--card);padding:25px;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;color:var(--ink)}.subjectCard span{font-size:42px;margin-bottom:auto}.subjectCard b{font-size:26px}.subjectCard small{color:var(--muted);margin-top:5px}
+.chapterLibraryHeader{margin:15px 0}.chapterLibraryHeader h2{font-size:35px;margin:0 0 5px}
+.chapterLibrary{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.chapterFile{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 7px 25px rgba(30,55,33,.07)}.chapterFileHead{padding:16px;display:flex;justify-content:space-between;gap:10px;align-items:center}.chapterFileHead b{font-size:17px}.lectureList{border-top:1px solid var(--line);padding:10px 14px}.lecture{padding:11px 5px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.lecture:last-child{border-bottom:0}.ytBtn{display:inline-flex;text-decoration:none;background:#b72d2d;color:white;padding:7px 10px;border-radius:8px;font-size:12px;white-space:nowrap}.noLecture{color:var(--muted);font-size:13px;padding:4px 0}
+@media(max-width:700px){.subjectCards{grid-template-columns:1fr}.chapterLibrary{grid-template-columns:1fr}.oneShotIntro h2{font-size:30px}}
+.resourceActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.resourceFile{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.resourceFile a{color:inherit;text-decoration:none}.pdfBtn{background:var(--accent);color:white;border:0;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer}.resourceHint{padding:12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:13px;margin-top:10px}
+
+.subPage{background:linear-gradient(rgba(231,239,223,.96),rgba(248,246,235,.97));position:fixed;inset:0;z-index:15;overflow:auto}.subWrap{max-width:1150px;margin:auto;padding:24px}.subHead{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.navMini{border:0;background:transparent;color:var(--leaf);font-weight:700}.dashHero{display:flex;justify-content:space-between;align-items:center;gap:20px;background:var(--card);border:1px solid var(--line);padding:28px;border-radius:24px;box-shadow:var(--shadow)}.dashHero h1{font-size:42px;margin:6px 0}.dashBadge{padding:12px 16px;border-radius:999px;background:#e5eedf;font-weight:700}.statsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.statCard,.panel,.profileCard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}.statCard span{display:block;color:var(--muted);font-size:14px}.statCard b{display:block;font-size:30px;margin-top:8px}.dashboardGrid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}.quickGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.quick{border:1px solid var(--line);background:#fff;border-radius:14px;padding:16px;text-align:left;font-weight:700}.searchBox{background:var(--card);padding:20px;border-radius:20px;box-shadow:var(--shadow)}.searchBox input{width:100%;padding:16px;border:1px solid var(--line);border-radius:14px}.resourceResults{display:grid;gap:12px;margin-top:18px}.resourceItem{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;justify-content:space-between;gap:12px;align-items:center}.resourceItem h3{margin:0 0 5px}.resourceItem p{margin:0;color:var(--muted)}.profileCard{display:flex;align-items:center;gap:18px}.avatar{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;background:var(--leaf);color:white;font-weight:800;font-size:22px}.profileForm{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;margin-top:18px;background:var(--card);padding:20px;border-radius:20px}.profileForm label{display:grid;gap:7px}.profileForm select,.profileForm input{padding:12px;border:1px solid var(--line);border-radius:10px}.announcement{padding:12px 0;border-bottom:1px solid var(--line)}@media(max-width:800px){.statsGrid{grid-template-columns:repeat(2,1fr)}.dashboardGrid{grid-template-columns:1fr}.quickGrid{grid-template-columns:repeat(2,1fr)}.profileForm{grid-template-columns:1fr}.dashHero{align-items:flex-start;flex-direction:column}.dashHero h1{font-size:34px}}
+
+/* FINAL UI POLISH */
+:root{--accent:var(--leaf);--radius:20px}
+body{line-height:1.45;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:12;margin:0 -20px;padding:15px 20px;background:rgba(247,245,234,.78);backdrop-filter:blur(14px);border-bottom:1px solid rgba(31,65,39,.10)}
+.logo{transition:transform .2s ease;white-space:nowrap}.logo:hover{transform:translateY(-1px)}
+.navlinks a,.navMini{padding:8px 9px;border-radius:10px;transition:.2s ease}.navlinks a:hover,.navMini:hover{background:rgba(49,91,59,.09);color:var(--leaf)}
+.btn,.option,.subjectCard,.quick,.communityTab,.uploadBtn,.voiceBtn,.postAction,.resourceItem,.chapterFile,.statCard{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(49,91,59,.25)}
+.option:hover,.subjectCard:hover,.resourceItem:hover,.chapterFile:hover,.statCard:hover{transform:translateY(-3px);box-shadow:0 20px 45px rgba(30,55,33,.16);border-color:rgba(49,91,59,.25)}
+.quick:hover,.communityTab:hover,.uploadBtn:hover,.voiceBtn:hover,.postAction:hover{transform:translateY(-1px);border-color:rgba(49,91,59,.3)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(198,154,69,.55);outline-offset:2px}
+input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease}input:focus,select:focus,textarea:focus{border-color:var(--leaf2);box-shadow:0 0 0 3px rgba(79,122,79,.10);outline:0}
+.modalbox,.subPage{scrollbar-width:thin;scrollbar-color:rgba(49,91,59,.35) transparent}
+.chapterList,.subPage{scrollbar-width:thin}
+.emptyState{padding:30px;text-align:center;color:var(--muted);background:rgba(255,255,255,.58);border:1px dashed var(--line);border-radius:18px}
+@media(max-width:850px){
+  nav{margin:0 -16px;padding:12px 16px;gap:10px}
+  .navlinks{display:flex;gap:3px;overflow-x:auto;max-width:calc(100vw - 115px);scrollbar-width:none;white-space:nowrap}
+  .navlinks::-webkit-scrollbar{display:none}
+  .navlinks a,.navMini{font-size:12px;padding:7px 8px}
+}
+@media(max-width:550px){
+  .container{padding:0 14px}.hero{padding:45px 0}.hero p{font-size:16px}.section{padding:48px 0}
+  h1{letter-spacing:3px}.section h2{font-size:31px}.option{min-height:180px}
+  .dashHero,.panel,.profileCard,.statCard,.searchBox{border-radius:17px}
+  .statsGrid{gap:10px}.statCard{padding:15px}.statCard b{font-size:25px}
+  .quickGrid{grid-template-columns:1fr 1fr;gap:8px}.quick{padding:13px}
+  .subWrap{padding:16px}.subHead{margin-bottom:15px}.subHead h2{font-size:24px}
+  .igBanner{align-items:flex-start;gap:10px;flex-direction:column}.igBanner strong{font-size:20px}
+}
+
+</style>
+</head>
+<body>
+<div class="page" id="homePage">
+<div class="container">
+<nav><div class="logo">BATTALION DH</div><div style="display:flex;align-items:center;gap:18px"><div class="navlinks"><a href="#missions">Missions</a><a href="#blog">Blog</a><a href="#about">About</a><button class="navMini" onclick="requireLogin(openDashboard)">Dashboard</button><button class="navMini" onclick="requireLogin(openProfile)">Profile</button></div><button id="loginBtn" class="btn alt" style="padding:9px 15px" onclick="openLogin()">Login</button></div></nav>
+<section class="hero">
+<div>
+<span class="badge">DISCIPLINE • CONSISTENCY • PROGRESS</span>
+<h1>BATTALION DH</h1>
+<p>A quiet place to plan your studies, build your routine, and complete the mission one day at a time.</p>
+<div class="quote" id="quote"></div>
+<div class="cta" style="margin-top:24px"><button class="btn" onclick="requireLogin(openMission)">ENTER MISSION DH</button><button class="btn alt" onclick="document.getElementById('missions').scrollIntoView()">EXPLORE</button></div>
+</div>
+</section>
+
+<section class="section" id="missions">
+<h2>Choose your mission</h2><p>Pick the tool you need today. Your progress stays saved on this device.</p>
+<div class="options">
+<div class="option"><div class="icon">🎯</div><h3>Mission DH</h3><p>Open your 10-day backlog plan and check off every lecture and target.</p><button class="btn" onclick="requireLogin(openMission)">Open mission</button></div>
+
+<div class="option"><div class="icon">⚔️</div><h3>Make Your Operation</h3><p>Select JEE PCM chapters, enter lectures per chapter, choose your deadline, and generate a personalized operation. Your selections are remembered on this device.</p><button class="btn" onclick="requireLogin(openOperation)">Create operation</button></div><div class="option"><div class="icon">▶️</div><h3>Best One Shot JEE</h3><p>Find chapter-wise one-shot lectures for JEE Physics, Chemistry and Mathematics, curated by moderators.</p><button class="btn" onclick="requireLogin(openOneShot)">Explore one-shots</button></div><div class="option"><div class="icon">👥</div><h3>Community</h3><p>Ask doubts and discuss JEE questions with the Battalion community using text, photos and voice rooms.</p><button class="btn" onclick="requireLogin(openCommunity)">Enter community</button></div><div class="option"><div class="icon">📝</div><h3>Notes</h3><p>Browse chapter-wise PDF notes for JEE Physics, Chemistry and Mathematics, curated by moderators.</p><button class="btn" onclick="requireLogin(()=>openResourceHome('notes'))">Open notes</button></div><div class="option"><div class="icon">📚</div><h3>Books</h3><p>Browse Physics, Chemistry and Mathematics PDF books, curated by moderators.</p><button class="btn" onclick="requireLogin(()=>openResourceHome('books'))">Open books</button></div><div class="option"><div class="icon">🔎</div><h3>Resource Search</h3><p>Search One Shots, Notes and Books from one place.</p><button class="btn" onclick="requireLogin(openSearch)">Search resources</button></div><div class="option"><div class="icon">⭐</div><h3>Saved Resources</h3><p>Bookmark useful lectures and PDFs for quick access.</p><button class="btn" onclick="requireLogin(openBookmarks)">My saved resources</button></div><div class="option"><div class="icon">📖</div><h3>DH Blog</h3><p>Short notes on consistency, backlog recovery, revision and focused study.</p><button class="btn" onclick="document.getElementById('blog').scrollIntoView()">Read blog</button></div>
+</div>
+</section>
+
+<section class="section" id="blog">
+<h2>DH Blog</h2><p>Small reminders for long missions.</p>
+<div class="blog">
+<article class="blogcard"><div>01 · BACKLOG</div><h3>Don't wait for the perfect day</h3><p>A backlog becomes manageable when you convert it into small, visible tasks and keep moving even after an imperfect day.</p></article>
+<article class="blogcard"><div>02 · ROUTINE</div><h3>Make the next action obvious</h3><p>Instead of planning an entire month every night, decide what lecture, questions or revision block comes next.</p></article>
+<article class="blogcard"><div>03 · CONSISTENCY</div><h3>Protect your sleep</h3><p>A routine is easier to maintain when sleep is treated as part of the study plan rather than time stolen from it.</p></article>
+</div>
+</section>
+<section class="section" id="about"><h2>About Battalion DH</h2><p>Battalion DH is a personal study dashboard designed around missions, routines and steady progress. It is not about being perfect—it is about returning to the plan.</p></section>
+<footer>© 2026 BATTALION DH · Study. Execute. Repeat.</footer>
+</div>
+</div>
+
+<div id="routinePage">
+<div class="container">
+<div class="routine-top"><div><div class="logo">BATTALION DH / MISSION DH</div><div class="small">10-day mission dashboard</div></div><button class="btn alt" onclick="backHome()">← Home</button></div>
+<div class="routine-shell">
+<div class="welcome"><div><div class="small">COMMANDER</div><h2 id="userName">Student</h2><div class="small" id="dateRange">2 Oct → 11 Oct</div></div><button class="btn alt reset" onclick="resetMission()">Reset progress</button></div>
+<div class="progress"><div style="display:flex;justify-content:space-between"><b id="pct">0% complete</b><span class="small" id="count">0 / 0</span></div><div class="progress"><div class="fill" id="fill"></div></div></div>
+<div id="plan"></div>
+</div></div></div>
+
+
+
+
+<div id="dashboardPage" class="subPage" style="display:none;min-height:100vh;padding-bottom:60px"><div class="subWrap"><div class="subHead"><div><div class="logo">BATTALION DH / DASHBOARD</div><div class="small">Your study command centre</div></div><button class="btn alt" onclick="closeSubPages()">← Home</button></div><div class="dashHero"><div><div class="small">WELCOME BACK</div><h1 id="dashWelcome">Student</h1><p>Keep your mission moving. Everything important is in one place.</p></div><div class="dashBadge">⚔️ STAY CONSISTENT</div></div><div class="statsGrid"><div class="statCard"><span>Mission Progress</span><b id="dashMission">0%</b></div><div class="statCard"><span>Completed Targets</span><b id="dashTargets">0</b></div><div class="statCard"><span>Study Streak</span><b id="dashStreak">1 day</b></div><div class="statCard"><span>Saved Resources</span><b id="dashSaved">0</b></div></div><div class="dashboardGrid"><div class="panel"><h2>⚡ Quick Actions</h2><div class="quickGrid"><button class="quick" onclick="openMission()">🎯 Mission DH</button><button class="quick" onclick="openOperation()">⚔️ Make Operation</button><button class="quick" onclick="openOneShot()">▶️ One Shots</button><button class="quick" onclick="openResourceHome('notes')">📝 Notes</button><button class="quick" onclick="openResourceHome('books')">📚 Books</button><button class="quick" onclick="openCommunity()">👥 Community</button></div></div><div class="panel"><h2>📌 Announcements</h2><div id="dashboardAnnouncements"></div></div></div></div></div>
+<div id="searchPage" class="subPage" style="display:none;min-height:100vh;padding-bottom:60px"><div class="subWrap"><div class="subHead"><div><div class="logo">BATTALION DH / SEARCH</div><div class="small">Find your study resources</div></div><button class="btn alt" onclick="closeSubPages()">← Home</button></div><div class="searchBox"><input id="globalSearch" oninput="renderSearch(this.value)" placeholder="Search chapters, lectures, notes or books..."></div><div id="searchResults" class="resourceResults"></div></div></div>
+<div id="bookmarksPage" class="subPage" style="display:none;min-height:100vh;padding-bottom:60px"><div class="subWrap"><div class="subHead"><div><div class="logo">BATTALION DH / SAVED</div><div class="small">Your bookmarked resources</div></div><button class="btn alt" onclick="closeSubPages()">← Home</button></div><div id="bookmarkResults" class="resourceResults"></div></div></div>
+<div id="profilePage" class="subPage" style="display:none;min-height:100vh;padding-bottom:60px"><div class="subWrap"><div class="subHead"><div><div class="logo">BATTALION DH / PROFILE</div><div class="small">Your account</div></div><button class="btn alt" onclick="closeSubPages()">← Home</button></div><div class="profileCard"><div class="avatar">DH</div><div><div class="small">USERNAME</div><h1 id="profileName">Student</h1><p id="profileEmail"></p></div></div><div class="profileForm"><label>Class <select id="profileClass"><option>Class 11</option><option selected>Class 12</option><option>Dropper</option></select></label><label>Target exam <select id="profileExam"><option selected>JEE Main</option><option>JEE Advanced</option><option>Boards</option></select></label><button class="btn" onclick="saveProfile()">Save profile</button></div></div></div>
+<div id="moderatorPage" class="subPage" style="display:none;min-height:100vh;padding-bottom:60px"><div class="subWrap"><div class="subHead"><div><div class="logo">BATTALION DH / MODERATOR</div><div class="small">Real content management</div></div><button class="btn alt" onclick="closeSubPages()">← Home</button></div><div class="dashboardGrid"><div class="panel"><h2>Upload resources</h2><p class="small">Only authenticated moderator accounts can upload or delete resources.</p><div class="field"><label>Resource type</label><select id="modType" onchange="updateModeratorResourceInput()"><option value="one_shot">One Shot YouTube Link</option><option value="notes">Notes PDF</option><option value="books">Book PDF</option></select></div><div class="field"><label>Title</label><input id="modTitle" placeholder="Resource title"></div><div class="field"><label>Subject</label><select id="modSubject"><option>Physics</option><option>Chemistry</option><option>Mathematics</option></select></div><div class="field"><label>Chapter / category</label><input id="modChapter" placeholder="Chapter or category"></div><div class="field" id="modLinkField"><label>YouTube link</label><input id="modResource" placeholder="https://youtube.com/watch?v=..."></div><div class="field" id="modFileField" style="display:none"><label>PDF file</label><input id="modFile" type="file" accept="application/pdf"></div><button class="btn" onclick="uploadModeratorResource()">Upload Resource</button><div id="modResourceMsg" class="small" style="margin-top:10px"></div></div><div class="panel"><h2>📢 Announcement</h2><div class="field"><label>Message</label><textarea id="modAnnouncement" rows="5" placeholder="Write an announcement..."></textarea></div><button class="btn" onclick="addAnnouncement()">Publish announcement</button><div id="modAnnouncementMsg" class="small" style="margin-top:10px"></div></div></div><div class="panel" style="margin-top:18px"><h2>🗂️ Manage resources</h2><div id="moderatorResourceList" class="resourceResults"></div></div></div></div></div>
+<div id="oneShotPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container">
+    <div class="routine-top">
+      <div><div class="logo">BATTALION DH / BEST ONE SHOT JEE</div><div class="small">Chapter-wise JEE lecture library</div></div>
+      <button class="btn alt" onclick="closeOneShot()">← Home</button>
+    </div>
+    <div class="oneShotIntro">
+      <div class="small">CURATED BY MODERATORS</div>
+      <h2>Best One Shot JEE</h2>
+      <p>Choose a subject to browse all JEE chapters and their recommended one-shot lectures.</p>
+    </div>
+    <div class="subjectCards">
+      <button class="subjectCard" onclick="openOneShotSubject('Physics')"><span>⚡</span><b>Physics</b><small>JEE chapters</small></button>
+      <button class="subjectCard" onclick="openOneShotSubject('Chemistry')"><span>🧪</span><b>Chemistry</b><small>JEE chapters</small></button>
+      <button class="subjectCard" onclick="openOneShotSubject('Mathematics')"><span>📐</span><b>Mathematics</b><small>JEE chapters</small></button>
+    </div>
+  </div>
+</div>
+
+<div id="oneShotSubjectPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container">
+    <div class="routine-top">
+      <div><div class="logo">BATTALION DH / <span id="oneShotSubjectTitle">PHYSICS</span></div><div class="small">Moderator-curated one-shots</div></div>
+      <button class="btn alt" onclick="backToOneShotSubjects()">← Subjects</button>
+    </div>
+    <div class="chapterLibraryHeader">
+      <h2 id="chapterLibraryTitle">Physics</h2>
+      <p class="small">Every JEE chapter has its own file. Only moderators can add or change YouTube lectures.</p>
+    </div>
+    <div id="oneShotChapterList" class="chapterLibrary"></div>
+  </div>
+</div>
+<div id="notesPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container"><div class="routine-top"><div><div class="logo">BATTALION DH / NOTES</div><div class="small">Chapter-wise PDF notes library</div></div><button class="btn alt" onclick="closeResource('notes')">← Home</button></div>
+  <div class="oneShotIntro"><div class="small">MODERATOR CURATED</div><h2>Notes</h2><p>Choose a subject and open chapter files containing moderator-uploaded PDF notes.</p></div>
+  <div class="subjectCards"><button class="subjectCard" onclick="openResourceSubject('notes','Physics')"><span>⚡</span><b>Physics</b><small>JEE chapters</small></button><button class="subjectCard" onclick="openResourceSubject('notes','Chemistry')"><span>🧪</span><b>Chemistry</b><small>JEE chapters</small></button><button class="subjectCard" onclick="openResourceSubject('notes','Mathematics')"><span>📐</span><b>Mathematics</b><small>JEE chapters</small></button></div></div>
+</div>
+<div id="booksPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container"><div class="routine-top"><div><div class="logo">BATTALION DH / BOOKS</div><div class="small">Subject-wise PDF book library</div></div><button class="btn alt" onclick="closeResource('books')">← Home</button></div>
+  <div class="oneShotIntro"><div class="small">MODERATOR CURATED</div><h2>Books</h2><p>Choose Physics, Chemistry or Mathematics to open the direct moderator-uploaded PDF book library.</p></div>
+  <div class="subjectCards"><button class="subjectCard" onclick="openResourceSubject('books','Physics')"><span>⚡</span><b>Physics</b><small>JEE chapters</small></button><button class="subjectCard" onclick="openResourceSubject('books','Chemistry')"><span>🧪</span><b>Chemistry</b><small>JEE chapters</small></button><button class="subjectCard" onclick="openResourceSubject('books','Mathematics')"><span>📐</span><b>Mathematics</b><small>JEE chapters</small></button></div></div>
+</div>
+<div id="resourceSubjectPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container"><div class="routine-top"><div><div class="logo">BATTALION DH / <span id="resourceTitle">NOTES</span></div><div class="small" id="resourceSubtitle">Moderator-curated PDF library</div></div><button class="btn alt" onclick="backToResourceSubjects()">← Subjects</button></div>
+  <div class="chapterLibraryHeader"><h2 id="resourceChapterTitle">Physics</h2><p class="small" id="resourceDescription">Only moderators can add PDF resources.</p></div><div id="resourceChapterList" class="chapterLibrary"></div></div>
+</div>
+<div id="communityPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container">
+    <div class="routine-top">
+      <div>
+        <div class="logo">BATTALION DH / COMMUNITY</div>
+        <div class="small">Study together. Ask. Explain. Learn.</div>
+      </div>
+      <button class="btn alt" onclick="closeCommunity()">← Home</button>
+    </div>
+
+    <div class="igBanner">
+      <div>
+        <div class="small">FOLLOW THE BATTALION</div>
+        <strong>@rajnaitik00</strong>
+      </div>
+      <span>Instagram</span>
+    </div>
+
+    <div class="communityTabs">
+      <button class="communityTab active" onclick="switchCommunity('students',this)">🎓 Students Feed</button>
+      <button class="communityTab" onclick="switchCommunity('moderator',this)">🛡️ Moderator Feed</button>
+    </div>
+
+    <section id="studentsFeed" class="communityPanel">
+      <div class="composer">
+        <textarea id="doubtText" placeholder="Share your doubt, question, solution, or study update..."></textarea>
+        <div class="composerActions">
+          <label class="uploadBtn">📷 Photo<input id="doubtPhoto" type="file" accept="image/*" hidden></label>
+          <button class="voiceBtn" onclick="startVoice()">🎙️ Voice doubt</button>
+          <button class="btn" onclick="postDoubt()">Post doubt</button>
+        </div>
+        <div id="voiceStatus" class="small"></div>
+      </div>
+      <div id="studentPosts"></div>
+    </section>
+
+    <section id="moderatorFeed" class="communityPanel" style="display:none">
+      <div class="moderatorNotice">🛡️ <b>Moderator Feed</b><br><span class="small">Announcements, verified explanations, rules and important study updates can appear here.</span></div>
+      <div id="moderatorPosts"></div>
+    </section>
+  </div>
+</div>
+<div id="generatedOperationPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container">
+    <div class="routine-top">
+      <div>
+        <div class="logo">BATTALION DH / YOUR OPERATION</div>
+        <div class="small">Personalized JEE mission</div>
+      </div>
+      <button class="btn alt" onclick="closeGeneratedOperation()">← Back to Operation Setup</button>
+    </div>
+    <div class="routine-shell">
+      <div id="generatedOperationContent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="loginModal">
+  <div class="modalbox" style="max-width:460px">
+    <h2 id="authTitle">Login to BATTALION DH</h2>
+    <p class="small">Use your email address as your BATTALION DH username.</p>
+    <div class="field">
+      <label>Email</label>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Enter password">
+    </div>
+    <div id="authMessage" class="small" style="margin-top:8px"></div>
+    <div class="actions">
+      <button class="btn alt" onclick="closeModals()">Cancel</button>
+      <button class="btn" id="authSubmit" onclick="submitAuth()">Login</button>
+    </div>
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn alt" style="border:0;background:transparent" onclick="toggleAuthMode()" id="authToggle">New here? Create account</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="operationModal"><div class="modalbox" style="max-width:850px"><h2>⚔️ Make Your Operation</h2><p class="small">Choose JEE PCM chapters, enter lectures for each, and tell DH how many days you have.</p><div class="field"><label>Operation name</label><input id="opName" placeholder="e.g. Operation JEE Comeback"></div><div class="field"><label>Days to complete</label><input id="opDays" type="number" min="1" max="365" value="10"></div><div class="threecols" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0"><div><b>Physics</b><div id="physicsChapters" class="chapterList"></div></div><div><b>Chemistry</b><div id="chemistryChapters" class="chapterList"></div></div><div><b>Mathematics</b><div id="mathChapters" class="chapterList"></div></div></div><div id="selectedChapters"></div><div class="actions"><button class="btn alt" onclick="closeModals()">Cancel</button><button class="btn" onclick="generateOperation()">Generate Operation</button></div><div id="operationOutput"></div></div></div><div class="modal" id="missionModal"><div class="modalbox">
+<h2>Enter Mission DH</h2><p class="small">Set the name and start date for this mission. The 10-day plan will adjust automatically.</p>
+<div class="field"><label>Your name</label><input id="nameInput" placeholder="Enter your name"></div>
+<div class="field"><label>Mission start date</label><input id="dateInput" type="date" value="2026-10-02"></div>
+<div class="actions"><button class="btn alt" onclick="closeModals()">Cancel</button><button class="btn" onclick="launchMission()">Launch Mission</button></div>
+</div></div>
+
+</div>
+
+</div>
+
+<script>
+const quotes=[
+"“You do not need a perfect day. You need the next completed task.”",
+"“Small progress, repeated daily, becomes a finished syllabus.”",
+"“Discipline is remembering what you decided when motivation changes.”",
+"“One lecture. One page. One problem. Then the next.”",
+"“Return to the mission.”"
+];
+document.getElementById('quote').textContent=quotes[Math.floor(Math.random()*quotes.length)];
+
+const basePlan=[
+["2 Oct",["Determinant — 2 lectures","Thermodynamics — Lectures 9, 10, 11","Sleep — minimum 6 h, maximum 8 h"]],
+["3 Oct",["Thermodynamics — Complete","Parabola — Lectures 1, 2, 3, 4, 5","Thermal Properties of Matter — Lectures 3, 4, 5","Determinant — 1 lecture"]],
+["4 Oct",["Thermal Properties of Matter — Lectures 6, 7","Chemical Equilibrium — Lectures 1, 2, 3, 4","Parabola — Lectures 6, 7","Determinant — 1 lecture"]],
+["5 Oct",["Ellipse — Lectures 1, 2, 3, 4, 5","Chemical Equilibrium — Complete","Ionic Equilibrium — Lectures 1, 2, 3","Determinant — 1 lecture"]],
+["6 Oct",["Permutations & Combinations — 9 h target","Ionic Equilibrium — Lectures 4, 5","Determinant — 1 lecture"]],
+["7 Oct",["Ionic Equilibrium — Complete","Electrochemistry — Lectures 1, 2, 3","Kinetic Theory — 2 lectures","Thermodynamics — 2 lectures","Determinant — 1 lecture"]],
+["8 Oct",["Thermodynamics — Complete","Binomial — Complete","Fluid Mechanics — 3 lectures"]],
+["9 Oct",["Sequence & Series — 2 lectures","Chemical Bonding — 6 lectures","Fluid Mechanics — 3 lectures"]],
+["10 Oct",["Fluid Mechanics — Complete","Sequence & Series — Complete","Chemical Bonding — 2 lectures"]],
+["11 Oct",["Electrochemistry — Complete","Chemical Bonding — Complete","Oscillation — 5 lectures"]]
+];
+let state=JSON.parse(localStorage.getItem('dh-progress')||'{}');
+
+function fmt(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});}
+function openMission(){document.getElementById('missionModal').classList.add('show')}
+function openRoutineBuilder(){document.getElementById('routineModal').classList.add('show')}
+function openAI(){document.getElementById('aiModal').classList.add('show')}
+function closeModals(){document.querySelectorAll('.modal').forEach(x=>x.classList.remove('show'))}
+function launchMission(){
+ const name=document.getElementById('nameInput').value.trim()||'Student';
+ const start=new Date(document.getElementById('dateInput').value+'T12:00:00');
+ localStorage.setItem('dh-name',name);localStorage.setItem('dh-start',start.toISOString());
+ closeModals();showMission();
+}
+function showMission(){
+ document.getElementById('homePage').style.display='none';document.getElementById('routinePage').style.display='block';
+ const name=localStorage.getItem('dh-name')||'Student';const start=new Date(localStorage.getItem('dh-start')||'2026-10-02T12:00:00');
+ document.getElementById('userName').textContent=name;
+ const end=new Date(start);end.setDate(start.getDate()+9);
+ document.getElementById('dateRange').textContent=fmt(start)+' → '+fmt(end);
+ renderPlan(start);
+ window.scrollTo(0,0);
+}
+function renderPlan(start){
+ const wrap=document.getElementById('plan');wrap.innerHTML='';
+ let n=0;
+ basePlan.forEach((day)=>{
+  const d=new Date(start);d.setDate(start.getDate()+n++);
+  const sec=document.createElement('section');sec.className='day';
+  sec.innerHTML=`<div class="dayhead"><b>Day ${n} · ${fmt(d)}</b><span class="small">${day[1].length} targets</span></div><div class="tasks"></div>`;
+  const tasks=sec.querySelector('.tasks');
+  day[1].forEach((t,i)=>{const id='d'+(n-1)+'-'+i;const row=document.createElement('label');row.className='task';row.innerHTML=`<input type="checkbox" data-id="${id}" ${state[id]?'checked':''}><span>${t}</span>`;tasks.appendChild(row)});
+  wrap.appendChild(sec);
+ });
+ document.querySelectorAll('#plan input').forEach(x=>x.addEventListener('change',update));
+ update();
+}
+function update(){
+ const all=[...document.querySelectorAll('#plan input')];
+ all.forEach(x=>x.closest('.task').classList.toggle('done',x.checked));
+ all.forEach(x=>state[x.dataset.id]=x.checked);localStorage.setItem('dh-progress',JSON.stringify(state));
+ const done=all.filter(x=>x.checked).length,total=all.length,p=total?Math.round(done/total*100):0;
+ document.getElementById('pct').textContent=p+'% complete';document.getElementById('count').textContent=done+' / '+total;document.getElementById('fill').style.width=p+'%';
+}
+function resetMission(){if(confirm('Reset all Mission DH progress?')){state={};localStorage.removeItem('dh-progress');showMission()}}
+function backHome(){document.getElementById('routinePage').style.display='none';document.getElementById('homePage').style.display='block';window.scrollTo(0,0)}
+function makeRoutine(){
+ const h=parseInt(document.getElementById('routineHours').value),p=document.getElementById('routinePriority').value||'your priority';
+ document.getElementById('routineOutput').innerHTML=`<div style="margin-top:18px;padding:15px;border-radius:12px;background:#e7efe2"><b>${document.getElementById('routineName').value||'My Routine'}</b><p>Recommended ${h}-hour block: 50% ${p}, 30% practice/questions, 20% revision + error review.</p></div>`;
+}
+function recommend(){
+ const h=+document.getElementById('aiHours').value,s=document.getElementById('aiSubjects').value||'your subjects',t=document.getElementById('aiTarget').value||'your target';
+ const blocks=h>=7?['2 h — highest-priority subject','1.5 h — second subject','1 h — practice/DPP','1 h — third subject','30 min — revision/error log']:h>=5?['1.5 h — highest-priority subject','1.5 h — second subject','1 h — practice/DPP','1 h — revision']:['1.5 h — priority subject','1 h — practice','30 min — revision'];
+ document.getElementById('aiOutput').innerHTML=`<div style="margin-top:18px;padding:15px;border-radius:12px;background:#e7efe2"><b>${h}-hour recommendation for ${t}</b><p>Subjects: ${s}</p><ul>${blocks.map(x=>'<li>'+x+'</li>').join('')}</ul></div>`;
+}
+const JEE_CHAPTERS={
+Physics:["Units & Measurements","Kinematics","Laws of Motion","Work, Energy & Power","Centre of Mass & System of Particles","Rotational Motion","Gravitation","Properties of Solids","Properties of Fluids","Thermal Properties of Matter","Thermodynamics","Kinetic Theory of Gases","Oscillations","Waves","Electrostatics","Capacitance","Current Electricity","Moving Charges & Magnetism","Electromagnetic Induction","Alternating Current","Electromagnetic Waves","Ray Optics","Wave Optics","Dual Nature of Matter","Atoms","Nuclei","Semiconductors","Experimental Physics"],
+Chemistry:["Some Basic Concepts of Chemistry","Structure of Atom","Classification of Elements & Periodicity","Chemical Bonding","Thermodynamics","Equilibrium","Redox Reactions","Solutions","Electrochemistry","Chemical Kinetics","Surface Chemistry","p-Block Elements","d- and f-Block Elements","Coordination Compounds","General Organic Chemistry","Hydrocarbons","Haloalkanes & Haloarenes","Alcohols, Phenols & Ethers","Aldehydes, Ketones & Carboxylic Acids","Amines","Biomolecules","Polymers","Chemistry in Everyday Life","Practical Chemistry"],
+Mathematics:["Sets","Relations & Functions","Trigonometric Functions","Trigonometric Equations","Complex Numbers","Quadratic Equations","Sequences & Series","Permutations & Combinations","Binomial Theorem","Mathematical Induction","Straight Lines","Circles","Parabola","Ellipse","Hyperbola","Limits","Continuity & Differentiability","Application of Derivatives","Indefinite Integration","Definite Integration","Area Under Curves","Differential Equations","Matrices","Determinants","Vector Algebra","Three Dimensional Geometry","Probability","Statistics"]};
+let savedOperation=JSON.parse(localStorage.getItem("dh-operation")||'{"chapters":[]}');
+function openOperation(){closeModals();document.getElementById("operationModal").classList.add("show");renderChapterSelectors()}
+function renderChapterSelectors(){for(const [s,chs] of Object.entries(JEE_CHAPTERS)){const id = s==="Mathematics" ? "mathChapters" : s.toLowerCase()+"Chapters"; const box=document.getElementById(id);box.innerHTML=chs.map(ch=>{const v=savedOperation.chapters.find(x=>x.subject===s&&x.chapter===ch);return `<label class="chapterItem"><input type="checkbox" data-subject="${s}" data-chapter="${ch}" ${v?"checked":""} onchange="refreshSelected()"> <span>${ch}</span></label>`}).join("")}refreshSelected()}
+function refreshSelected(){const sel=[...document.querySelectorAll("#operationModal input[type=checkbox]:checked")],holder=document.getElementById("selectedChapters");if(!sel.length){holder.innerHTML='<div class="small">Select chapters above. Previously selected chapters remain remembered.</div>';return}holder.innerHTML="<b>Lectures per selected chapter</b>"+sel.map(x=>{const v=savedOperation.chapters.find(y=>y.subject===x.dataset.subject&&y.chapter===x.dataset.chapter);const key=encodeURIComponent(x.dataset.subject+"|"+x.dataset.chapter);return `<div class="opRow"><span>${x.dataset.subject} — ${x.dataset.chapter}</span><input class="lectureBox" type="number" min="1" value="${v?.lectures||1}" data-key="${key}"></div>`}).join("")}
+function generateOperation(){
+  const selected=[...document.querySelectorAll("#operationModal input[type=checkbox]:checked")];
+  const days=Math.max(1,parseInt(document.getElementById("opDays").value)||1);
+  if(!selected.length){alert("Select at least one chapter.");return}
+
+  const chapters=selected.map(x=>{
+    const key=encodeURIComponent(x.dataset.subject+"|"+x.dataset.chapter);
+    const input=document.querySelector(`[data-key="${key}"]`);
+    return {
+      subject:x.dataset.subject,
+      chapter:x.dataset.chapter,
+      lectures:Math.max(1,parseInt(input?.value)||1)
+    };
+  });
+
+  savedOperation={
+    name:document.getElementById("opName").value.trim()||"My Operation",
+    days,
+    chapters
+  };
+  localStorage.setItem("dh-operation",JSON.stringify(savedOperation));
+
+  const total=chapters.reduce((sum,c)=>sum+c.lectures,0);
+  const daily=Math.ceil(total/days);
+  let cursor=0;
+
+  let output=`<div class="operation-plan">
+    <div class="operation-summary">
+      <h3>${savedOperation.name}</h3>
+      <div class="stats">${chapters.length} chapters · ${total} lectures · ${days} days · about ${daily} lectures/day</div>
+      <div class="operation-progress"><div id="opProgressFill" class="operation-progress-fill"></div></div>
+      <div class="small" id="opProgressText" style="margin-top:7px">0% complete · 0 targets</div>
+    </div>`;
+
+  for(let d=1;d<=days;d++){
+    const remaining=total-cursor;
+    const take=Math.min(daily,remaining);
+    const dayItems=[];
+
+    for(let k=0;k<take;k++){
+      const pos=cursor;
+      let cumulative=0;
+      for(const c of chapters){
+        if(pos<cumulative+c.lectures){
+          dayItems.push({subject:c.subject,chapter:c.chapter,lecture:pos-cumulative+1});
+          break;
+        }
+        cumulative+=c.lectures;
+      }
+      cursor++;
+    }
+
+    const merged=[];
+    dayItems.forEach(item=>{
+      const last=merged[merged.length-1];
+      if(last && last.subject===item.subject && last.chapter===item.chapter && last.end===item.lecture-1){
+        last.end=item.lecture;
+      }else{
+        merged.push({subject:item.subject,chapter:item.chapter,start:item.lecture,end:item.lecture});
+      }
+    });
+
+    output+=`<section class="operation-day" data-op-day="${d}">
+      <div class="operation-day-head">
+        <b>Day ${d}</b><span>${merged.length} targets</span>
+      </div><div>`;
+
+    merged.forEach((item,j)=>{
+      const label=item.start===item.end?`Lecture ${item.start}`:`Lectures ${item.start}–${item.end}`;
+      output+=`<label class="operation-task">
+        <input type="checkbox" data-op-task="${d}-${j}" onchange="updateOperationProgress()">
+        <span>${item.subject} · ${item.chapter} — ${label}</span>
+      </label>`;
+    });
+    output+=`</div></section>`;
+  }
+
+  output+=`</div>`;
+
+  document.getElementById("generatedOperationContent").innerHTML=output;
+  document.getElementById("operationModal").classList.remove("show");
+  document.getElementById("homePage").style.display="none";
+  document.getElementById("routinePage").style.display="none";
+  document.getElementById("generatedOperationPage").style.display="block";
+  window.scrollTo(0,0);
+  updateOperationProgress();
+}
+
+function updateOperationProgress(){
+  const boxes=[...document.querySelectorAll("#operationOutput input[data-op-task]")];
+  boxes.forEach(x=>x.closest(".operation-task").classList.toggle("done",x.checked));
+  const done=boxes.filter(x=>x.checked).length;
+  const total=boxes.length;
+  const pct=total?Math.round(done/total*100):0;
+  const fill=document.getElementById("opProgressFill");
+  const text=document.getElementById("opProgressText");
+  if(fill) fill.style.width=pct+"%";
+  if(text) text.textContent=pct+"% complete · "+done+" / "+total+" targets";
+}
+
+function closeGeneratedOperation(){
+  document.getElementById("generatedOperationPage").style.display="none";
+  document.getElementById("homePage").style.display="block";
+  window.scrollTo(0,0);
+}
+
+function isLoggedIn(){return !!localStorage.getItem("dh-current-user");}
+function requireLogin(action){if(!isLoggedIn()){openLogin();return} action();}
+
+let authMode="login";
+
+function openLogin(){
+  authMode="login";
+  updateAuthUI();
+  document.getElementById("loginModal").classList.add("show");
+}
+function toggleAuthMode(){
+  authMode=authMode==="login"?"signup":"login";
+  updateAuthUI();
+}
+function updateAuthUI(){
+  const title=document.getElementById("authTitle");
+  const submit=document.getElementById("authSubmit");
+  const toggle=document.getElementById("authToggle");
+  const msg=document.getElementById("authMessage");
+  title.textContent=authMode==="login"?"Login to BATTALION DH":"Create your BATTALION DH account";
+  submit.textContent=authMode==="login"?"Login":"Create account";
+  toggle.textContent=authMode==="login"?"New here? Create account":"Already have an account? Login";
+  msg.textContent="";
+}
+function submitAuth(){
+  const email=document.getElementById("authEmail").value.trim().toLowerCase();
+  const password=document.getElementById("authPassword").value;
+  const msg=document.getElementById("authMessage");
+  if(!email || !email.includes("@")){msg.textContent="Please enter a valid email address.";return}
+  if(password.length<6){msg.textContent="Password must be at least 6 characters.";return}
+
+  /*
+    Demo-only local account:
+    This keeps the login UI working while the site is static.
+    Passwords are NOT suitable for production storage in localStorage.
+    A real public website should use Firebase/Supabase/Auth0 or another
+    server-side authentication provider.
+  */
+  const key="dh-account-"+email;
+  const existing=JSON.parse(localStorage.getItem(key)||"null");
+
+  if(authMode==="signup"){
+    if(existing){msg.textContent="An account with this email already exists. Please login.";return}
+    localStorage.setItem(key,JSON.stringify({email:email,password:password}));
+    localStorage.setItem("dh-current-user",email);
+    finishLogin(email);
+  }else{
+    if(!existing || existing.password!==password){msg.textContent="Incorrect email or password.";return}
+    localStorage.setItem("dh-current-user",email);
+    finishLogin(email);
+  }
+}
+function finishLogin(email){
+  closeModals();
+  const btn=document.getElementById("loginBtn");
+  if(btn){
+    btn.textContent=email;
+    btn.onclick=logoutUser;
+    btn.title="Click to log out";
+  }
+  // Use email as the default commander name for new Mission DH sessions.
+  if(!localStorage.getItem("dh-name")) localStorage.setItem("dh-name",email);
+}
+function logoutUser(){
+  localStorage.removeItem("dh-current-user");
+  const btn=document.getElementById("loginBtn");
+  if(btn){
+    btn.textContent="Login";
+    btn.onclick=openLogin;
+  }
+}
+function restoreLogin(){
+  const email=localStorage.getItem("dh-current-user");
+  if(email) finishLogin(email);
+}
+restoreLogin();
+
+let voiceRecorder=null, voiceChunks=[];
+const demoModeratorPosts=[
+  {title:"Welcome to BATTALION DH Community",body:"Use the Students Feed for questions and discussions. Moderator Feed will contain official announcements and verified study updates.",time:"Moderator"},
+  {title:"Community rules",body:"Keep doubts academic and respectful. Do not share passwords, personal contact details, or unsafe content.",time:"Moderator"}
+];
+function openCommunity(){
+  document.getElementById("homePage").style.display="none";
+  document.getElementById("routinePage").style.display="none";
+  document.getElementById("generatedOperationPage").style.display="none";
+  document.getElementById("communityPage").style.display="block";
+  renderCommunity();
+  window.scrollTo(0,0);
+}
+function closeCommunity(){
+  document.getElementById("communityPage").style.display="none";
+  document.getElementById("homePage").style.display="block";
+  window.scrollTo(0,0);
+}
+function switchCommunity(type,button){
+  document.querySelectorAll(".communityTab").forEach(x=>x.classList.remove("active"));
+  button.classList.add("active");
+  document.getElementById("studentsFeed").style.display=type==="students"?"block":"none";
+  document.getElementById("moderatorFeed").style.display=type==="moderator"?"block":"none";
+}
+function postDoubt(){
+  const text=document.getElementById("doubtText").value.trim();
+  const file=document.getElementById("doubtPhoto").files[0];
+  if(!text && !file){alert("Write a doubt or attach a photo first.");return}
+  const current=localStorage.getItem("dh-current-user")||"Student";
+  const reader=new FileReader();
+  const save=(photo)=>{const posts=JSON.parse(localStorage.getItem("dh-student-posts")||"[]");posts.unshift({user:current,text,photo:photo||"",time:new Date().toLocaleString()});localStorage.setItem("dh-student-posts",JSON.stringify(posts));document.getElementById("doubtText").value="";document.getElementById("doubtPhoto").value="";renderCommunity()};
+  if(file){reader.onload=()=>save(reader.result);reader.readAsDataURL(file)}else save("");
+}
+function renderCommunity(){
+  const posts=JSON.parse(localStorage.getItem("dh-student-posts")||"[]");
+  const box=document.getElementById("studentPosts");
+  box.innerHTML=posts.length?posts.map((p,i)=>`<article class="communityPost"><div class="postMeta"><b>🎓 ${escapeHtml(p.user)}</b><span class="small">${escapeHtml(p.time)}</span></div><div class="postBody">${escapeHtml(p.text)}</div>${p.photo?`<img class="postPhoto" src="${p.photo}" alt="Student doubt photo">`:""}<div class="postActions"><button class="postAction" onclick="alert('Replies will be connected to the community backend.')">💬 Reply</button><button class="postAction" onclick="alert('Voice reply will be available when live community audio is connected.')">🎙️ Voice reply</button></div></article>`).join(""):'<div class="operation-empty">No student doubts yet. Be the first to post one.</div>';
+  document.getElementById("moderatorPosts").innerHTML=demoModeratorPosts.map(p=>`<article class="communityPost"><div class="postMeta"><b>🛡️ ${escapeHtml(p.time)}</b><span class="small">Official</span></div><h3 style="margin:6px 0">${escapeHtml(p.title)}</h3><div class="postBody">${escapeHtml(p.body)}</div></article>`).join("");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+async function startVoice(){
+  const status=document.getElementById("voiceStatus");
+  if(!navigator.mediaDevices?.getUserMedia){status.textContent="Voice recording is not supported by this browser.";return}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    voiceChunks=[];voiceRecorder=new MediaRecorder(stream);
+    voiceRecorder.ondataavailable=e=>{if(e.data.size)voiceChunks.push(e.data)};
+    voiceRecorder.onstop=()=>{stream.getTracks().forEach(t=>t.stop());status.textContent="Voice recording captured locally. Live voice rooms require a server/WebRTC backend.";};
+    voiceRecorder.start();status.textContent="🔴 Recording… tap Voice doubt again to stop.";
+    setTimeout(()=>{if(voiceRecorder?.state==="recording")voiceRecorder.stop()},30000);
+  }catch(e){status.textContent="Microphone permission was not granted."}
+}
+document.addEventListener("click",e=>{
+  if(e.target?.classList?.contains("voiceBtn") && voiceRecorder?.state==="recording") voiceRecorder.stop();
+});
+
+const ONE_SHOT_CHAPTERS={
+Physics:JEE_CHAPTERS.Physics,
+Chemistry:JEE_CHAPTERS.Chemistry,
+Mathematics:JEE_CHAPTERS.Mathematics
+};
+let currentOneShotSubject="Physics";
+
+function openOneShot(){
+  document.getElementById("homePage").style.display="none";
+  document.getElementById("oneShotPage").style.display="block";
+  document.getElementById("oneShotSubjectPage").style.display="none";
+  window.scrollTo(0,0);
+}
+function closeOneShot(){
+  document.getElementById("oneShotPage").style.display="none";
+  document.getElementById("oneShotSubjectPage").style.display="none";
+  document.getElementById("homePage").style.display="block";
+  window.scrollTo(0,0);
+}
+function openOneShotSubject(subject){
+  currentOneShotSubject=subject;
+  document.getElementById("oneShotPage").style.display="none";
+  document.getElementById("oneShotSubjectPage").style.display="block";
+  document.getElementById("oneShotSubjectTitle").textContent=subject.toUpperCase();
+  document.getElementById("chapterLibraryTitle").textContent=subject;
+  renderOneShotChapters(subject);
+  window.scrollTo(0,0);
+}
+function backToOneShotSubjects(){
+  document.getElementById("oneShotSubjectPage").style.display="none";
+  document.getElementById("oneShotPage").style.display="block";
+  window.scrollTo(0,0);
+}
+function getOneShotLibrary(){
+  return JSON.parse(localStorage.getItem("dh-one-shots")||"{}");
+}
+function renderOneShotChapters(subject){
+  const lib=getOneShotLibrary(), subjectLib=lib[subject]||{};
+  const chapters=ONE_SHOT_CHAPTERS[subject]||[];
+  document.getElementById("oneShotChapterList").innerHTML=chapters.map((chapter,i)=>{
+    const lectures=subjectLib[chapter]||[];
+    return `<article class="chapterFile">
+      <div class="chapterFileHead"><b>${i+1}. ${chapter}</b><span class="small">${lectures.length} lecture${lectures.length===1?"":"s"}</span></div>
+      <div class="lectureList">${lectures.length?lectures.map(l=>`<div class="lecture"><span>▶️ ${escapeHtml(l.title)}</span><a class="ytBtn" href="${escapeHtml(l.url)}" target="_blank" rel="noopener">Watch</a></div>`).join(""):'<div class="noLecture">No moderator lecture added yet.</div>'}</div>
+    </article>`;
+  }).join("");
+}
+function addModeratorOneShot(subject,chapter,title,url){
+  // Front-end prototype: moderator-only UI will later be protected by real authentication.
+  const lib=getOneShotLibrary();
+  lib[subject]=lib[subject]||{};
+  lib[subject][chapter]=lib[subject][chapter]||[];
+  lib[subject][chapter].push({title,url});
+  localStorage.setItem("dh-one-shots",JSON.stringify(lib));
+  renderOneShotChapters(subject);
+}
+
+const RESOURCE_CHAPTERS={Physics:JEE_CHAPTERS.Physics,Chemistry:JEE_CHAPTERS.Chemistry,Mathematics:JEE_CHAPTERS.Mathematics};
+let currentResourceType='notes', currentResourceSubject='Physics';
+function openResourceHome(type){
+  currentResourceType=type; document.getElementById('homePage').style.display='none';
+  document.getElementById('notesPage').style.display=type==='notes'?'block':'none';
+  document.getElementById('booksPage').style.display=type==='books'?'block':'none';
+  document.getElementById('resourceSubjectPage').style.display='none'; window.scrollTo(0,0);
+}
+function closeResource(type){document.getElementById(type==='notes'?'notesPage':'booksPage').style.display='none';document.getElementById('homePage').style.display='block';window.scrollTo(0,0);}
+function openResourceSubject(type,subject){
+  currentResourceType=type; currentResourceSubject=subject;
+  document.getElementById('notesPage').style.display='none'; document.getElementById('booksPage').style.display='none';
+  document.getElementById('resourceSubjectPage').style.display='block';
+  document.getElementById('resourceTitle').textContent=type.toUpperCase()+' / '+subject.toUpperCase();
+  document.getElementById('resourceSubtitle').textContent=type==='notes'?'Moderator-curated PDF notes':'Moderator-curated PDF books';
+  document.getElementById('resourceChapterTitle').textContent=subject;
+  document.getElementById('resourceDescription').textContent=type==='notes'?'Each chapter is a file. Only moderators can add PDF notes.':'Direct subject-wise PDF book library. Only moderators can add books.';
+  renderResourceChapters(); window.scrollTo(0,0);
+}
+function backToResourceSubjects(){document.getElementById('resourceSubjectPage').style.display='none';document.getElementById(currentResourceType==='notes'?'notesPage':'booksPage').style.display='block';window.scrollTo(0,0);}
+function getResourceLibrary(type){return JSON.parse(localStorage.getItem('dh-'+type)||'{}');}
+function renderResourceChapters(){
+  const lib=getResourceLibrary(currentResourceType), subjectLib=lib[currentResourceSubject]||{};
+
+  // Books are organised only by subject. After Physics/Chemistry/Mathematics,
+  // open one direct PDF library page — no chapter level is used for books.
+  if(currentResourceType==='books'){
+    const files=Array.isArray(subjectLib)?subjectLib:[];
+    document.getElementById('resourceChapterList').innerHTML=files.length
+      ? files.map(f=>`<article class="chapterFile"><div class="chapterFileHead"><b>📚 ${escapeHtml(f.title)}</b><span class="small">PDF BOOK</span></div><div class="lectureList"><div class="resourceFile"><span>PDF book resource</span><a class="pdfBtn" href="${f.data}" target="_blank" rel="noopener">Open PDF</a></div></div></article>`).join('')
+      : '<article class="chapterFile"><div class="noLecture">No moderator PDF book added yet.</div></article>';
+    return;
+  }
+
+  const chapters=RESOURCE_CHAPTERS[currentResourceSubject]||[];
+  document.getElementById('resourceChapterList').innerHTML=chapters.map((chapter,i)=>{const files=subjectLib[chapter]||[];return `<article class="chapterFile"><div class="chapterFileHead"><b>${i+1}. ${escapeHtml(chapter)}</b><span class="small">${files.length} PDF${files.length===1?'':'s'}</span></div><div class="lectureList">${files.length?files.map(f=>`<div class="resourceFile"><span>📄 ${escapeHtml(f.title)}</span><a class="pdfBtn" href="${f.data}" target="_blank" rel="noopener">Open PDF</a></div>`).join(''):'<div class="noLecture">No moderator PDF added yet.</div>'}</div></article>`}).join('');
+}
+function addModeratorPDF(type,subject,chapter,title,file){
+  const reader=new FileReader(); reader.onload=()=>{const lib=getResourceLibrary(type);
+    if(type==='books'){
+      lib[subject]=Array.isArray(lib[subject])?lib[subject]:[];
+      lib[subject].push({title:title||file.name,data:reader.result});
+    }else{
+      lib[subject]=lib[subject]||{};lib[subject][chapter]=lib[subject][chapter]||[];
+      lib[subject][chapter].push({title:title||file.name,data:reader.result});
+    }
+    localStorage.setItem('dh-'+type,JSON.stringify(lib));
+    if(currentResourceType===type&&currentResourceSubject===subject)renderResourceChapters();
+  };reader.readAsDataURL(file);
+}
+
+const resourceCatalog=[{type:'One Shot',title:'Physics One Shot Library',subject:'Physics',chapter:'All JEE chapters',action:'openOneShot()'},{type:'One Shot',title:'Chemistry One Shot Library',subject:'Chemistry',chapter:'All JEE chapters',action:'openOneShot()'},{type:'One Shot',title:'Mathematics One Shot Library',subject:'Mathematics',chapter:'All JEE chapters',action:'openOneShot()'},{type:'Notes',title:'Physics Notes',subject:'Physics',chapter:'Chapter-wise PDF notes',action:"openResourceHome('notes')"},{type:'Notes',title:'Chemistry Notes',subject:'Chemistry',chapter:'Chapter-wise PDF notes',action:"openResourceHome('notes')"},{type:'Notes',title:'Mathematics Notes',subject:'Mathematics',chapter:'Chapter-wise PDF notes',action:"openResourceHome('notes')"},{type:'Books',title:'Physics Books',subject:'Physics',chapter:'Direct PDF book library',action:"openResourceHome('books')"},{type:'Books',title:'Chemistry Books',subject:'Chemistry',chapter:'Direct PDF book library',action:"openResourceHome('books')"},{type:'Books',title:'Mathematics Books',subject:'Mathematics',chapter:'Direct PDF book library',action:"openResourceHome('books')"}];
+function hideAllSub(){['dashboardPage','searchPage','bookmarksPage','profilePage','moderatorPage'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('homePage').style.display='none'}
+function closeSubPages(){document.querySelectorAll('.subPage').forEach(x=>x.style.display='none');document.getElementById('homePage').style.display='block'}
+function openDashboard(){hideAllSub();document.getElementById('dashboardPage').style.display='block';const email=localStorage.getItem('dh-user')||'Student';document.getElementById('dashWelcome').textContent=email.split('@')[0];document.getElementById('dashSaved').textContent=JSON.parse(localStorage.getItem('dh-bookmarks')||'[]').length;renderAnnouncements()}
+function openSearch(){hideAllSub();document.getElementById('searchPage').style.display='block';renderSearch('')}
+function renderSearch(q){const a=q.trim().toLowerCase();const items=resourceCatalog.filter(x=>!a||Object.values(x).join(' ').toLowerCase().includes(a));document.getElementById('searchResults').innerHTML=items.map(x=>`<div class="resourceItem"><div><h3>${x.title}</h3><p>${x.subject} · ${x.chapter} · ${x.type}</p></div><div style="display:flex;gap:8px"><button class="btn alt" onclick="bookmarkResource('${x.title.replace(/'/g,"\'")}','${x.type}','${x.subject}')">☆ Save</button><button class="btn" onclick="${x.action}">Open</button></div></div>`).join('')||'<div class="panel">No resources found.</div>'}
+function openBookmarks(){hideAllSub();document.getElementById('bookmarksPage').style.display='block';const items=JSON.parse(localStorage.getItem('dh-bookmarks')||'[]');document.getElementById('bookmarkResults').innerHTML=items.length?items.map((x,i)=>`<div class="resourceItem"><div><h3>${x.title}</h3><p>${x.subject} · ${x.type}</p></div><button class="btn alt" onclick="removeBookmark(${i})">Remove</button></div>`).join(''):'<div class="panel"><h2>No saved resources yet</h2><p>Use ☆ Save whenever you find something useful.</p></div>'}
+function bookmarkResource(title,type,subject){const a=JSON.parse(localStorage.getItem('dh-bookmarks')||'[]');if(!a.some(x=>x.title===title)){a.push({title,type,subject});localStorage.setItem('dh-bookmarks',JSON.stringify(a))}alert('Saved to My Resources ⭐')}
+function removeBookmark(i){const a=JSON.parse(localStorage.getItem('dh-bookmarks')||'[]');a.splice(i,1);localStorage.setItem('dh-bookmarks',JSON.stringify(a));openBookmarks()}
+function openProfile(){hideAllSub();document.getElementById('profilePage').style.display='block';const email=localStorage.getItem('dh-user')||'Student';document.getElementById('profileName').textContent=email.split('@')[0];document.getElementById('profileEmail').textContent=email;document.getElementById('profileClass').value=localStorage.getItem('dh-class')||'Class 12';document.getElementById('profileExam').value=localStorage.getItem('dh-exam')||'JEE Main'}
+function saveProfile(){localStorage.setItem('dh-class',document.getElementById('profileClass').value);localStorage.setItem('dh-exam',document.getElementById('profileExam').value);alert('Profile saved ✓')}
+function renderAnnouncements(){const a=JSON.parse(localStorage.getItem('dh-announcements')||'[]');document.getElementById('dashboardAnnouncements').innerHTML=(a.length?a: [{msg:'Welcome to BATTALION DH. Your study mission starts here.',time:'System'}]).slice(0,5).map(x=>`<div class="announcement"><b>${x.msg}</b><div class="small">${x.time}</div></div>`).join('')}
+function openModerator(){hideAllSub();document.getElementById('moderatorPage').style.display='block'}
+function mockModeratorUpload(){const t=document.getElementById('modTitle').value.trim();if(!t){alert('Enter a resource title');return}alert('Resource added to the prototype library. Backend storage and moderator permissions will be connected later.')}
+function addAnnouncement(){const m=document.getElementById('modAnnouncement').value.trim();if(!m)return;const a=JSON.parse(localStorage.getItem('dh-announcements')||'[]');a.unshift({msg:m,time:new Date().toLocaleString()});localStorage.setItem('dh-announcements',JSON.stringify(a));document.getElementById('modAnnouncement').value='';alert('Announcement published ✓');}
+</script>
+
+<script>
+/* BATTALION DH backend integration */
+const DH_API = '';
+function dhToken(){return localStorage.getItem('dh-auth-token')||''}
+function dhUser(){try{return JSON.parse(localStorage.getItem('dh-user-object')||'null')}catch{return null}}
+async function dhFetch(path, options={}){
+  const headers=new Headers(options.headers||{});
+  if(dhToken()) headers.set('Authorization','Bearer '+dhToken());
+  if(options.body && !(options.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type','application/json');
+  const res=await fetch(DH_API+path,{...options,headers});
+  let data={}; try{data=await res.json()}catch{}
+  if(!res.ok) throw new Error(data.error||('Request failed ('+res.status+')'));
+  return data;
+}
+function isLoggedIn(){return !!dhToken() && !!dhUser()}
+function requireLogin(action){if(!isLoggedIn()){openLogin();return} action()}
+function finishLoginUser(user,token){
+  localStorage.setItem('dh-auth-token',token); localStorage.setItem('dh-user-object',JSON.stringify(user));
+  localStorage.setItem('dh-current-user',user.email); localStorage.setItem('dh-user',user.email); localStorage.setItem('dh-name',user.username);
+  updateAuthUIState(); closeModals();
+}
+function updateAuthUIState(){
+ const u=dhUser(),btn=document.getElementById('loginBtn');
+ if(!btn)return;
+ if(u){btn.textContent='Logout';btn.onclick=logoutUser;} else {btn.textContent='Login';btn.onclick=openLogin;}
+}
+async function submitAuth(){
+ const email=document.getElementById('authEmail').value.trim().toLowerCase(), password=document.getElementById('authPassword').value, msg=document.getElementById('authMessage');
+ msg.textContent='Connecting…';
+ try{
+  if(authMode==='signup'){
+   const username=(prompt('Choose your BATTALION DH username:')||email.split('@')[0]).trim();
+   const moderatorCode=prompt('Moderator invite code (leave blank for student):')||'';
+   const data=await dhFetch('/api/auth/register',{method:'POST',body:JSON.stringify({email,password,username,moderatorCode})});
+   finishLoginUser(data.user,data.token); alert('Account created ✓');
+  } else {
+   const data=await dhFetch('/api/auth/login',{method:'POST',body:JSON.stringify({email,password})});
+   finishLoginUser(data.user,data.token); alert('Login successful ✓');
+  }
+ }catch(e){msg.textContent=e.message}
+}
+async function restoreLogin(){
+ if(!dhToken()){updateAuthUIState();return}
+ try{const data=await dhFetch('/api/me');localStorage.setItem('dh-user-object',JSON.stringify(data.user));localStorage.setItem('dh-current-user',data.user.email);localStorage.setItem('dh-user',data.user.email);localStorage.setItem('dh-name',data.user.username);updateAuthUIState();}
+ catch{logoutUser(false)}
+}
+function logoutUser(show=true){localStorage.removeItem('dh-auth-token');localStorage.removeItem('dh-user-object');localStorage.removeItem('dh-current-user');localStorage.removeItem('dh-user');localStorage.removeItem('dh-name');updateAuthUIState();if(show)alert('Logged out.');}
+async function openDashboard(){hideAllSub();document.getElementById('dashboardPage').style.display='block';const u=dhUser();document.getElementById('dashWelcome').textContent=u?.username||'Student';try{const b=await dhFetch('/api/bookmarks');document.getElementById('dashSaved').textContent=b.resources.length}catch{};renderAnnouncements();}
+async function renderAnnouncements(){
+ const box=document.getElementById('dashboardAnnouncements');try{const d=await dhFetch('/api/announcements');box.innerHTML=(d.announcements.length?d.announcements:[{title:'Welcome to BATTALION DH',body:'Your study mission starts here.',created_at:'System'}]).slice(0,5).map(x=>`<div class="announcement"><b>${escapeHtml(x.title)}</b><div>${escapeHtml(x.body)}</div><div class="small">${escapeHtml(x.created_at)}</div></div>`).join('')}catch(e){box.innerHTML='<div class="small">Could not load announcements.</div>'}}
+async function openBookmarks(){hideAllSub();document.getElementById('bookmarksPage').style.display='block';const box=document.getElementById('bookmarkResults');try{const d=await dhFetch('/api/bookmarks');box.innerHTML=d.resources.length?d.resources.map(x=>resourceRow(x,true)).join(''):'<div class="panel"><h2>No saved resources yet</h2><p>Use ☆ Save whenever you find something useful.</p></div>'}catch(e){box.innerHTML='<div class="panel">'+escapeHtml(e.message)+'</div>'}}
+function resourceRow(x,saved=false){const url=x.url||x.file_path||'';const open=url?`window.open('${url}','_blank')`:'void 0';return `<div class="resourceItem"><div><h3>${escapeHtml(x.title)}</h3><p>${escapeHtml(x.subject||'')} · ${escapeHtml(x.chapter||'')} · ${escapeHtml(x.type||'')}</p></div><div style="display:flex;gap:8px"><button class="btn" onclick="${open}">${x.url?'Watch':'Open PDF'}</button><button class="btn alt" onclick="toggleBookmark(${x.id})">${saved?'★ Saved':'☆ Save'}</button></div></div>`}
+async function toggleBookmark(id){try{const d=await dhFetch('/api/bookmarks/'+id,{method:'POST'});alert(d.saved?'Saved to My Resources ⭐':'Removed from My Resources');if(document.getElementById('bookmarksPage').style.display==='block')openBookmarks()}catch(e){alert(e.message)}}
+async function openSearch(){hideAllSub();document.getElementById('searchPage').style.display='block';await renderSearch('')}
+async function renderSearch(q){const box=document.getElementById('searchResults');box.innerHTML='<div class="panel">Searching…</div>';try{const d=await dhFetch('/api/resources?q='+encodeURIComponent(q||''));box.innerHTML=d.resources.length?d.resources.map(x=>resourceRow(x)).join(''):'<div class="panel">No resources found.</div>'}catch(e){box.innerHTML='<div class="panel">'+escapeHtml(e.message)+'</div>'}}
+async function openResourceSubject(type,subject){currentResourceType=type;document.getElementById('notesPage').style.display='none';document.getElementById('booksPage').style.display='none';document.getElementById('resourceSubjectPage').style.display='block';document.getElementById('resourceChapterTitle').textContent=subject;const list=document.getElementById('resourceChapterList');list.innerHTML='<div class="panel">Loading…</div>';try{const d=await dhFetch('/api/resources?type='+encodeURIComponent(type)+'&subject='+encodeURIComponent(subject));list.innerHTML=d.resources.length?d.resources.map(x=>`<div class="chapterFile"><div><b>${escapeHtml(x.title)}</b><div class="small">${escapeHtml(x.chapter||'')}</div></div><div style="display:flex;gap:8px"><button class="btn" onclick="window.open('${x.url||x.file_path}','_blank')">${x.url?'Watch':'Open PDF'}</button><button class="btn alt" onclick="toggleBookmark(${x.id})">☆ Save</button></div></div>`).join(''):'<div class="panel">No resources uploaded yet.</div>'}catch(e){list.innerHTML='<div class="panel">'+escapeHtml(e.message)+'</div>'}}
+async function renderOneShotChapters(subject){const list=document.getElementById('oneShotChapterList');list.innerHTML='<div class="panel">Loading…</div>';try{const d=await dhFetch('/api/resources?type=one_shot&subject='+encodeURIComponent(subject));const by={};d.resources.forEach(x=>(by[x.chapter||'Other']??=[]).push(x));const chapters=JEE_CHAPTERS[subject]||[];list.innerHTML=chapters.map(ch=>`<div class="chapterFile"><div><b>${escapeHtml(ch)}</b>${(by[ch]||[]).map(x=>`<div class="resourceItem" style="margin-top:10px"><div><b>${escapeHtml(x.title)}</b></div><button class="btn" onclick="window.open('${x.url}','_blank')">▶ Watch</button></div>`).join('')||'<div class="small">No moderator lecture added yet.</div>'}</div></div>`).join('')}catch(e){list.innerHTML='<div class="panel">'+escapeHtml(e.message)+'</div>'}}
+function updateModeratorResourceInput(){const t=document.getElementById('modType').value;document.getElementById('modLinkField').style.display=t==='one_shot'?'grid':'none';document.getElementById('modFileField').style.display=t==='one_shot'?'none':'grid'}
+async function uploadModeratorResource(){
+ const type=document.getElementById('modType').value,title=document.getElementById('modTitle').value.trim(),subject=document.getElementById('modSubject').value,chapter=document.getElementById('modChapter').value.trim(),msg=document.getElementById('modResourceMsg');
+ try{if(type==='one_shot'){const url=document.getElementById('modResource').value.trim();await dhFetch('/api/resources/link',{method:'POST',body:JSON.stringify({type,subject,chapter,title,url})})}else{const file=document.getElementById('modFile').files[0];if(!file)throw Error('Select a PDF file');const fd=new FormData();fd.append('file',file);fd.append('type',type);fd.append('subject',subject);fd.append('chapter',chapter);fd.append('title',title);await dhFetch('/api/resources/pdf',{method:'POST',body:fd})}msg.textContent='Uploaded successfully ✓';await loadModeratorResources();}catch(e){msg.textContent=e.message}}
+async function loadModeratorResources(){const box=document.getElementById('moderatorResourceList');if(!box)return;try{const d=await dhFetch('/api/resources');box.innerHTML=d.resources.map(x=>`<div class="resourceItem"><div><b>${escapeHtml(x.title)}</b><div class="small">${escapeHtml(x.type)} · ${escapeHtml(x.subject)} · ${escapeHtml(x.chapter||'')}</div></div><button class="btn alt" onclick="deleteModeratorResource(${x.id})">Delete</button></div>`).join('')||'<div class="small">No resources yet.</div>'}catch(e){box.innerHTML='<div class="small">'+escapeHtml(e.message)+'</div>'}}
+async function deleteModeratorResource(id){if(!confirm('Delete this resource?'))return;try{await dhFetch('/api/resources/'+id,{method:'DELETE'});loadModeratorResources()}catch(e){alert(e.message)}}
+async function addAnnouncement(){const body=document.getElementById('modAnnouncement').value.trim();const msg=document.getElementById('modAnnouncementMsg');if(!body)return;try{await dhFetch('/api/announcements',{method:'POST',body:JSON.stringify({title:'Moderator Announcement',body})});document.getElementById('modAnnouncement').value='';msg.textContent='Published ✓';renderAnnouncements()}catch(e){msg.textContent=e.message}}
+async function openModerator(){hideAllSub();document.getElementById('moderatorPage').style.display='block';const u=dhUser();if(u?.role!=='moderator'){alert('Moderator access required.');closeSubPages();return}updateModeratorResourceInput();loadModeratorResources()}
+async function openProfile(){hideAllSub();document.getElementById('profilePage').style.display='block';const u=dhUser();document.getElementById('profileName').textContent=u?.username||'Student';document.getElementById('profileEmail').textContent=u?.email||''}
+window.addEventListener('DOMContentLoaded',()=>{restoreLogin();updateModeratorResourceInput();});
+</script>
+</body>
+</html>
