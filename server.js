@@ -50,4 +50,6 @@ app.post('/api/announcements',auth,moderator,(req,res)=>{const {title,body}=req.
 app.delete('/api/announcements/:id',auth,moderator,(req,res)=>{db.prepare('DELETE FROM announcements WHERE id=?').run(req.params.id);res.json({ok:true});});
 
 app.get('*',(req,res)=>res.sendFile(path.join(root,'public','index.html')));
-app.listen(PORT,()=>console.log(`BATTALION DH running at http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`BATTALION DH running on port ${PORT}`);
+});
