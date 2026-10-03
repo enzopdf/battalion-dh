@@ -170,6 +170,17 @@ input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease}inp
 </style>
 </head>
 <body>
+
+<!-- LOGIN AD POPUP -->
+<div id="loginAd" class="ad-overlay" aria-hidden="true">
+  <div class="ad-box">
+    <button class="ad-close" id="adClose" aria-label="Close">&times;</button>
+    <a href="https://t.me/+AcAdSUPBPlo1YzI1" target="_blank" rel="noopener noreferrer">
+      <img src="/ad-poster.png" alt="Grand Line Academy">
+    </a>
+  </div>
+</div>
+
 <div class="page" id="homePage">
 <div class="container">
 <nav><div class="logo">BATTALION DH</div><div style="display:flex;align-items:center;gap:18px"><div class="navlinks"><a href="#missions">Missions</a><a href="#blog">Blog</a><a href="#about">About</a><button class="navMini" onclick="requireLogin(openDashboard)">Dashboard</button><button class="navMini" onclick="requireLogin(openProfile)">Profile</button></div><button id="loginBtn" class="btn alt" style="padding:9px 15px" onclick="openLogin()">Login</button></div></nav>
