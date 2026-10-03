@@ -833,10 +833,31 @@ async function dhFetch(path, options={}){
 }
 function isLoggedIn(){return !!dhToken() && !!dhUser()}
 function requireLogin(action){if(!isLoggedIn()){openLogin();return} action()}
-function finishLoginUser(user,token){
+function showLoginAd(){
+  const ad=document.getElementById("loginAd");
+  if(ad){
+    ad.classList.add("show");
+    ad.setAttribute("aria-hidden","false");
+  }
+}
+
+function closeLoginAd(){
+  const ad=document.getElementById("loginAd");
+  if(ad){
+    ad.classList.remove("show");
+    ad.setAttribute("aria-hidden","true");
+  }
+}
+
+document.getElementById("adClose")?.addEventListener("click",closeLoginAd);
+
+document.getElementById("loginAd")?.addEventListener("click",function(e){
+  if(e.target===this) closeLoginAd();
+});
+  function finishLoginUser(user,token){
   localStorage.setItem('dh-auth-token',token); localStorage.setItem('dh-user-object',JSON.stringify(user));
   localStorage.setItem('dh-current-user',user.email); localStorage.setItem('dh-user',user.email); localStorage.setItem('dh-name',user.username);
-  updateAuthUIState(); closeModals();
+  updateAuthUIState(); closeModals(); showLoginAd();
 }
 function updateAuthUIState(){
  const u=dhUser(),btn=document.getElementById('loginBtn');
