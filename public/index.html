@@ -345,36 +345,40 @@ input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease}inp
         <p>Answer honestly for a more useful estimate.</p>
 
         <form id="preparationForm">
-          <label>1. Syllabus completed</label>
-          <select id="prepSyllabus" required>
-            <option value="">Choose percentage</option>
-            <option value="10">0–20%</option>
-            <option value="30">21–40%</option>
-            <option value="50">41–60%</option>
-            <option value="70">61–80%</option>
-            <option value="90">81–100%</option>
-          </select>
+          <label for="prepCompleted">1. Which chapters have you completed?</label>
+<button type="button" class="btn alt" id="openCompletedChapters">
+  Select PCM Chapters
+</button>
+<div id="completedChapterSummary">No chapters selected yet</div>
 
-          <label>2. Recent JEE mock-test score (out of 300)</label>
-          <input id="prepMock" type="number" min="0" max="300" required placeholder="Example: 120">
+<div id="completedChapterPicker" style="display:none;">
+  <h3>Select completed chapters</h3>
+  <div id="completedChapterList"></div>
+  <button type="button" class="btn" id="saveCompletedChapters">
+    Save Completed Chapters
+  </button>
+  <button type="button" class="btn alt" id="selectAllCompleted">
+    Select All
+  </button>
+</div>
 
-          <label>3. How much of your completed syllabus do you revise regularly?</label>
-          <select id="prepRevision" required>
-            <option value="">Choose an answer</option>
-            <option value="25">Rarely</option>
-            <option value="50">Sometimes</option>
-            <option value="75">Most chapters</option>
-            <option value="100">Regularly, with spaced revision</option>
-          </select>
+<label for="prepRevision">2. Which chapters do you revise confidently?</label>
+<button type="button" class="btn alt" id="openRevisionChapters">
+  Select Chapters You Revise
+</button>
+<div id="revisionChapterSummary">No chapters selected yet</div>
 
-          <label>4. How much PYQ practice have you completed?</label>
-          <select id="prepPYQ" required>
-            <option value="">Choose an answer</option>
-            <option value="10">Very little</option>
-            <option value="35">Some chapters</option>
-            <option value="65">Most chapters</option>
-            <option value="100">Nearly all completed chapters</option>
-          </select>
+<div id="revisionChapterPicker" style="display:none;">
+  <h3>Select chapters you revise</h3>
+  <div id="revisionChapterList"></div>
+  <button type="button" class="btn" id="saveRevisionChapters">
+    Save Revision Chapters
+  </button>
+</div>
+
+<label for="prepMock">3. What was your last JEE mock-test score? (out of 300)</label>
+<input id="prepMock" type="number" min="0" max="300"
+       placeholder="Enter score (0–300)" required>
 
           <label>5. How consistently do you analyse mistakes after tests?</label>
           <select id="prepAnalysis" required>
@@ -1043,6 +1047,81 @@ async function addAnnouncement(){const body=document.getElementById('modAnnounce
 async function openModerator(){hideAllSub();document.getElementById('moderatorPage').style.display='block';const u=dhUser();if(u?.role!=='moderator'){alert('Moderator access required.');closeSubPages();return}updateModeratorResourceInput();loadModeratorResources()}
 async function openProfile(){hideAllSub();document.getElementById('profilePage').style.display='block';const u=dhUser();document.getElementById('profileName').textContent=u?.username||'Student';document.getElementById('profileEmail').textContent=u?.email||''}
 window.addEventListener('DOMContentLoaded',()=>{restoreLogin();updateModeratorResourceInput();});
-</script>
+// PREPARATION CHAPTER PICKERS
+(function () {
+  const chapters = JEE_CHAPTERS;
+
+  function renderList(containerId, prefix, saved = []) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    Object.entries(chapters).forEach(([subject, names]) => {
+      const heading = document.createElement("h4");
+      heading.textContent = subject;
+      container.appendChild(heading);
+
+      names.forEach(chapter => {
+        const label = document.createElement("label");
+        label.style.display = "block";
+        label.style.margin = "8px 0";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = chapter;
+        checkbox.dataset.subject = subject;
+        checkbox.checked = saved.includes(subject + "|" + chapter);
+
+        label.appendChild(checkbox);
+        label.append(" " + chapter);
+        container.appendChild(label);
+      });
+    });
+  }
+
+  function selected(containerId) {
+    return [...document.querySelectorAll(
+      "#" + containerId + ' input[type="checkbox"]:checked'
+    )].map(box => box.dataset.subject + "|" + box.value);
+  }
+
+  function summary(values, elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.textContent = values.length
+      ? values.length + " chapters selected"
+      : "No chapters selected yet";
+  }
+
+  document.getElementById("openCompletedChapters").onclick = () => {
+    document.getElementById("completedChapterPicker").style.display = "block";
+  };
+
+  document.getElementById("openRevisionChapters").onclick = () => {
+    document.getElementById("revisionChapterPicker").style.display = "block";
+  };
+
+  renderList("completedChapterList", "completed");
+  renderList("revisionChapterList", "revision");
+
+  document.getElementById("selectAllCompleted").onclick = () => {
+    document.querySelectorAll(
+      "#completedChapterList input[type=checkbox]"
+    ).forEach(box => box.checked = true);
+  };
+
+  document.getElementById("saveCompletedChapters").onclick = () => {
+    const values = selected("completedChapterList");
+    summary(values, "completedChapterSummary");
+    document.getElementById("completedChapterPicker").style.display = "none";
+  };
+
+  document.getElementById("saveRevisionChapters").onclick = () => {
+    const values = selected("revisionChapterList");
+    summary(values, "revisionChapterSummary");
+    document.getElementById("revisionChapterPicker").style.display = "none";
+  };
+})();</script>
 </body>
 </html>
