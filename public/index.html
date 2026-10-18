@@ -321,6 +321,89 @@ input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease}inp
     </section>
   </div>
 </div>
+<!-- JEE PREPARATION ANALYSIS PAGE -->
+<div id="preparationPage" style="display:none;min-height:100vh;padding-bottom:60px">
+  <div class="container">
+    <div class="routine-top">
+      <div>
+        <div class="logo">BATTALION DH / PREPARATION ANALYSIS</div>
+        <h1>JEE Preparation Meter</h1>
+        <p>Evaluate your preparation and discover what to improve next.</p>
+      </div>
+      <button class="btn alt" onclick="closePreparation()">Back</button>
+    </div>
+
+    <section class="section">
+      <div class="option">
+        <h2>Tell us about your preparation</h2>
+        <p>Answer honestly for a more useful estimate.</p>
+
+        <form id="preparationForm">
+          <label>1. Syllabus completed</label>
+          <select id="prepSyllabus" required>
+            <option value="">Choose percentage</option>
+            <option value="10">0–20%</option>
+            <option value="30">21–40%</option>
+            <option value="50">41–60%</option>
+            <option value="70">61–80%</option>
+            <option value="90">81–100%</option>
+          </select>
+
+          <label>2. Recent JEE mock-test score (out of 300)</label>
+          <input id="prepMock" type="number" min="0" max="300" required placeholder="Example: 120">
+
+          <label>3. How much of your completed syllabus do you revise regularly?</label>
+          <select id="prepRevision" required>
+            <option value="">Choose an answer</option>
+            <option value="25">Rarely</option>
+            <option value="50">Sometimes</option>
+            <option value="75">Most chapters</option>
+            <option value="100">Regularly, with spaced revision</option>
+          </select>
+
+          <label>4. How much PYQ practice have you completed?</label>
+          <select id="prepPYQ" required>
+            <option value="">Choose an answer</option>
+            <option value="10">Very little</option>
+            <option value="35">Some chapters</option>
+            <option value="65">Most chapters</option>
+            <option value="100">Nearly all completed chapters</option>
+          </select>
+
+          <label>5. How consistently do you analyse mistakes after tests?</label>
+          <select id="prepAnalysis" required>
+            <option value="">Choose an answer</option>
+            <option value="25">Almost never</option>
+            <option value="50">Sometimes</option>
+            <option value="75">Usually</option>
+            <option value="100">After every test</option>
+          </select>
+
+          <button class="btn" type="submit" style="margin-top:20px;width:100%">
+            Calculate My Preparation Score
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" id="preparationResult" style="display:none">
+      <div class="option">
+        <h2>Your Preparation Report</h2>
+        <h1 id="prepScore">0/100</h1>
+        <div style="height:12px;background:#ddd;border-radius:20px;overflow:hidden">
+          <div id="prepScoreBar" style="height:100%;width:0;background:#8b5cf6"></div>
+        </div>
+        <h3 id="prepVerdict"></h3>
+        <p id="prepFeedback"></p>
+        <button class="btn alt" onclick="document.getElementById('preparationForm').reset();document.getElementById('preparationResult').style.display='none';window.scrollTo(0,0)">
+          Retake Assessment
+        </button>
+      </div>
+    </section>
+  </div>
+</div>
+<!-- END PREPARATION ANALYSIS PAGE -->
+  
 <div id="generatedOperationPage" style="display:none;min-height:100vh;padding-bottom:60px">
   <div class="container">
     <div class="routine-top">
@@ -558,6 +641,55 @@ function closeGeneratedOperation(){
   document.getElementById("homePage").style.display="block";
   window.scrollTo(0,0);
 }
+function openPreparation(){
+  document.getElementById("homePage").style.display="none";
+  document.getElementById("routinePage").style.display="none";
+  document.getElementById("generatedOperationPage").style.display="none";
+  document.getElementById("communityPage").style.display="none";
+  document.getElementById("preparationPage").style.display="block";
+  window.scrollTo(0,0);
+}
+
+function closePreparation(){
+  document.getElementById("preparationPage").style.display="none";
+  document.getElementById("homePage").style.display="block";
+  window.scrollTo(0,0);
+}
+
+document.getElementById("preparationForm").addEventListener("submit",function(e){
+  e.preventDefault();
+
+  const syllabus=Number(document.getElementById("prepSyllabus").value);
+  const mock=Number(document.getElementById("prepMock").value);
+  const revision=Number(document.getElementById("prepRevision").value);
+  const pyq=Number(document.getElementById("prepPYQ").value);
+  const analysis=Number(document.getElementById("prepAnalysis").value);
+
+  const score=Math.round(
+    syllabus*0.25+
+    (mock/300*100)*0.35+
+    revision*0.20+
+    pyq*0.10+
+    analysis*0.10
+  );
+
+  document.getElementById("prepScore").textContent=score+"/100";
+  document.getElementById("prepScoreBar").style.width=score+"%";
+
+  let verdict="";
+  if(score>=80) verdict="Strong preparation";
+  else if(score>=60) verdict="Good progress — keep improving";
+  else if(score>=40) verdict="Building your foundation";
+  else verdict="Focus on fundamentals and consistency";
+
+  document.getElementById("prepVerdict").textContent=verdict;
+  document.getElementById("prepFeedback").textContent=
+    "Your score is an estimate based on your answers, not a prediction of your JEE rank. Prioritize weak chapters, regular revision, PYQs, and mock-test analysis.";
+
+  document.getElementById("preparationResult").style.display="block";
+  document.getElementById("preparationResult").scrollIntoView({behavior:"smooth"});
+});
+     
 
 function isLoggedIn(){return !!localStorage.getItem("dh-current-user");}
 function requireLogin(action){if(!isLoggedIn()){openLogin();return} action();}
