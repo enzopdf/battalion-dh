@@ -380,18 +380,32 @@ input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease}inp
 <input id="prepMock" type="number" min="0" max="300"
        placeholder="Enter score (0–300)" required>
 
-          <label>5. How consistently do you analyse mistakes after tests?</label>
-          <select id="prepAnalysis" required>
-            <option value="">Choose an answer</option>
-            <option value="25">Almost never</option>
-            <option value="50">Sometimes</option>
-            <option value="75">Usually</option>
-            <option value="100">After every test</option>
-          </select>
+<label class="prep-question" for="prepPYQ">4. How much PYQ practice have you completed?</label>
+<select id="prepPYQ" required>
+  <option value="">Choose an answer</option>
+  <option value="10">Very little</option>
+  <option value="35">Some chapters</option>
+  <option value="65">Most chapters</option>
+  <option value="100">Nearly all completed chapters</option>
+</select>
+          
+          
+<label class="prep-question" for="prepAnalysis">
+  5. How consistently do you analyse mistakes after tests?
+</label>
+<select id="prepAnalysis" required>
+  <option value="">Choose an answer</option>
+  <option value="25">Almost never</option>
+  <option value="50">Sometimes</option>
+  <option value="75">Usually</option>
+  <option value="100">After every test</option>
+</select>
 
-          <button class="btn" type="submit" style="margin-top:20px;width:100%">
-            Calculate My Preparation Score
-          </button>
+<button class="btn" type="submit" style="margin-top:20px;width:100%">
+  Calculate My Preparation Score
+</button>
+          
+          
         </form>
       </div>
     </section>
@@ -665,7 +679,7 @@ function closePreparation(){
   document.getElementById("homePage").style.display="block";
   window.scrollTo(0,0);
 }
-
+alert("Preparation script loaded");
 document.getElementById("preparationForm").addEventListener("submit",function(e){
   e.preventDefault();
 
